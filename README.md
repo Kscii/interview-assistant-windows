@@ -51,7 +51,7 @@ Windows 上的个人面试准备与字幕工具。提前整理个人资料，按
 
 目标系统为 Windows 10 2004（build 19041）及以后 / Windows 11，x64 CPU，无需 GPU。
 
-安装包包含 PP-OCRv4 检测/识别模型、方向模型、字典、ONNX Runtime 和第三方许可证。如果电脑没有 WebView2，安装程序会联网安装它。
+安装包包含 PP-OCRv4 检测/识别模型、方向模型、字典、ONNX Runtime、Visual C++ 运行库和第三方许可证。如果电脑没有 WebView2，安装程序会联网安装它。
 
 从 GitHub Actions 的 **Windows build and checks** 成功构建中下载 `Interview-Assistant-windows-x64`，解压并运行其中的 `.exe`。当前构建未配置代码签名。
 
@@ -62,6 +62,7 @@ Windows 构建依赖：Rust stable（至少 1.95）、Node.js 22+、Python 3.12+
 ```powershell
 npm ci
 python scripts/prepare-resources.py
+./scripts/prepare-msvc.ps1
 python scripts/collect-licenses.py
 npm run tauri -- dev
 ```
@@ -75,9 +76,10 @@ cargo test -p interview-assistant --locked
 cargo clippy --workspace --all-targets --locked -- -D warnings
 npm run build
 npm run tauri -- build --bundles nsis
+./scripts/test-installer.ps1
 ```
 
-安装包输出：`target/release/bundle/nsis/`。
+安装包输出：`target/release/bundle/nsis/`。安装测试会静默安装到项目 `artifacts/installed/`，验证文件并从安装目录执行 CPU OCR，结果保存在 `artifacts/installed-ocr.json`。这项测试不调用模型，也不创建个人档案。
 
 仅预览界面：
 

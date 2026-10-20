@@ -11,6 +11,26 @@ use tauri::{
     tray::TrayIconBuilder,
 };
 
+/// Installer smoke test: exercise the same OCR path using installed resources.
+/// No window, API key, model request, or user data is involved.
+pub fn check_installed_ocr(input: &std::path::Path, report: &std::path::Path) -> bool {
+    let started = std::time::Instant::now();
+    let result = (|| -> anyhow::Result<String> {
+        let executable = std::env::current_exe()?;
+        let root = executable
+            .parent()
+            .ok_or_else(|| anyhow::anyhow!("No application directory"))?;
+        let mut ocr = native::Ocr::load(root)?;
+        ocr.recognize(&image::open(input)?.into_rgb8())
+    })();
+    let (ok, text, error) = match result {
+        Ok(text) => (true, text, String::new()),
+        Err(error) => (false, String::new(), error.to_string()),
+    };
+    let json = serde_json::json!({"ok":ok,"text":text,"error":error,"elapsed_ms":started.elapsed().as_millis()});
+    std::fs::write(report, serde_json::to_vec_pretty(&json).unwrap()).is_ok() && ok
+}
+
 pub fn run() {
     tauri::Builder::default()
         .plugin(tauri_plugin_dialog::init())

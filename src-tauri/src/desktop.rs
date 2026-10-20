@@ -41,7 +41,10 @@ pub fn sync_overlay(app: &AppHandle, state: &AppState) -> Result<()> {
     let adjust = state.adjusting.load(Ordering::SeqCst);
     window.set_ignore_cursor_events(!adjust)?;
     window.set_focusable(adjust)?;
-    if state.is_visible() && !state.selecting.load(Ordering::SeqCst) {
+    if state.is_visible()
+        && !state.selecting.load(Ordering::SeqCst)
+        && !state.capturing.load(Ordering::SeqCst)
+    {
         window.show()?;
     } else {
         window.hide()?;
@@ -53,7 +56,10 @@ pub fn sync_overlay(app: &AppHandle, state: &AppState) -> Result<()> {
 pub fn toggle(app: &AppHandle, state: &AppState) -> Result<()> {
     state.visible.fetch_xor(true, Ordering::SeqCst);
     if let Some(w) = app.get_webview_window("overlay") {
-        if state.is_visible() && !state.selecting.load(Ordering::SeqCst) {
+        if state.is_visible()
+            && !state.selecting.load(Ordering::SeqCst)
+            && !state.capturing.load(Ordering::SeqCst)
+        {
             w.show()?;
         } else {
             w.hide()?;

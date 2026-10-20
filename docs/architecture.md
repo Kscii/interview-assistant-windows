@@ -38,6 +38,8 @@ SQLite 启用 WAL。档案、设置、连接元数据和任务记录使用 JSON 
 
 运行时二进制资料使用应用生成文件名，导入路径禁止逃离 sources 目录。文档与问题作为不可信材料，提示词要求忽略其中的操作指令；这并不等同于模型侧绝对的注入防护。
 
+Windows 安装包将 Visual C++ 可再发行 DLL 放在 EXE 同目录，OCR 模型及 ONNX Runtime 放在资源目录。准备脚本从 Windows 构建机的 Visual Studio x64 Redist 目录复制运行库，记录版本和 SHA-256；微软运行库使用其自己的分发条款。参见 [Microsoft 部署说明](https://learn.microsoft.com/en-us/cpp/windows/deployment-in-visual-cpp) 和 [Tauri 资源映射](https://v2.tauri.app/develop/resources/)。
+
 ## 延迟与恢复
 
 5 秒软提示与最终超时分开。并发模型只取首个有效完整结果；耗时统计针对回答阶段。OCR 失败提供重试、重新框选、手动输入、显式云端识别四种恢复路径。

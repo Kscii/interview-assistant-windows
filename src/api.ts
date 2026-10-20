@@ -1,7 +1,14 @@
 import { invoke } from "@tauri-apps/api/core";
 import { listen } from "@tauri-apps/api/event";
 import { open, save } from "@tauri-apps/plugin-dialog";
-import type { Snapshot, Profile, Connection, Settings, Answer } from "./types";
+import type {
+  Snapshot,
+  Profile,
+  Connection,
+  Settings,
+  Answer,
+  Region,
+} from "./types";
 import { defaultRules } from "./types";
 export const desktop = "__TAURI_INTERNALS__" in window;
 export const preview =
@@ -143,6 +150,20 @@ function previewRpc(action: string, p: Record<string, unknown>): unknown {
         overlay: demo.settings.overlay,
         adjusting: false,
       };
+    case "selector_info":
+      return {
+        id: "preview-monitor",
+        x: 0,
+        y: 0,
+        width: Math.round(innerWidth * devicePixelRatio),
+        height: Math.round(innerHeight * devicePixelRatio),
+        scale: devicePixelRatio,
+      };
+    case "finish_selection":
+      demo.settings.region = p.region as Region;
+      return null;
+    case "cancel_selection":
+      return null;
     case "cancel_job":
       return null;
     default:

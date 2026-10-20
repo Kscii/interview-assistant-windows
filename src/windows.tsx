@@ -99,13 +99,20 @@ export function SelectorWindow() {
   const [end, setEnd] = useState<{ x: number; y: number } | null>(null);
   const [error, setError] = useState("");
   useEffect(() => {
+    document.documentElement.classList.add("selecting");
     document.body.classList.add("selecting");
-    void rpc<Monitor>("selector_info").then(setMonitor);
+    void rpc<Monitor>("selector_info")
+      .then(setMonitor)
+      .catch((e) => setError(String(e)));
     const esc = (e: KeyboardEvent) => {
       if (e.key === "Escape") void rpc("cancel_selection");
     };
     window.addEventListener("keydown", esc);
-    return () => window.removeEventListener("keydown", esc);
+    return () => {
+      window.removeEventListener("keydown", esc);
+      document.documentElement.classList.remove("selecting");
+      document.body.classList.remove("selecting");
+    };
   }, []);
   const rect =
     start && end
@@ -130,10 +137,12 @@ export function SelectorWindow() {
       onPointerUp={(e) => {
         if (!monitor || !start) return;
         const scale = monitor.scale;
-        const x = Math.round(Math.min(start.x, e.clientX) * scale),
-          y = Math.round(Math.min(start.y, e.clientY) * scale);
-        const width = Math.round(Math.abs(e.clientX - start.x) * scale),
-          height = Math.round(Math.abs(e.clientY - start.y) * scale);
+        const endX = Math.max(0, Math.min(e.clientX, monitor.width / scale));
+        const endY = Math.max(0, Math.min(e.clientY, monitor.height / scale));
+        const x = Math.round(Math.min(start.x, endX) * scale),
+          y = Math.round(Math.min(start.y, endY) * scale);
+        const width = Math.round(Math.abs(endX - start.x) * scale),
+          height = Math.round(Math.abs(endY - start.y) * scale);
         if (width < 10 || height < 10) {
           setError("区域太小，请重新拖动框选");
           setStart(null);

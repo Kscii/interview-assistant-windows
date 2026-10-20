@@ -18,3 +18,5 @@
 /src-tauri/resources/resource-manifest.json
 /src-tauri/gen/
 *.tsbuildinfo
+/src-tauri/redistributables/*.dll
+/src-tauri/redistributables/msvc-runtime-manifest.json

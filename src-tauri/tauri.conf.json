@@ -43,12 +43,10 @@
     "active": true,
     "targets": ["nsis"],
     "icon": ["icons/icon.ico", "icons/32x32.png", "icons/128x128.png"],
-    "resources": [
-      "resources/models/*",
-      "resources/runtime/*",
-      "resources/licenses/**/*",
-      "resources/resource-manifest.json"
-    ],
+    "resources": {
+      "resources/": "resources/",
+      "redistributables/": ""
+    },
     "windows": {
       "webviewInstallMode": { "type": "downloadBootstrapper" },
       "nsis": {

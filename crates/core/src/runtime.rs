@@ -107,11 +107,11 @@ impl Runtime {
             self.publish(&state);
             return Ok(state);
         }
+        let refs = self.store.lock().unwrap().answers(&profile.id)?;
+        let system = answer_prompt(&active, &question, &refs);
         *current = state.clone();
         self.publish(&state);
         drop(current);
-        let refs = self.store.lock().unwrap().answers(&profile.id)?;
-        let system = answer_prompt(&active, &question, &refs);
         let runtime = self.clone();
         tokio::spawn(async move {
             let started = Instant::now();

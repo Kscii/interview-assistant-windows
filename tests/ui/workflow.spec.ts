@@ -64,3 +64,65 @@ test("settings retain configured overlay and shortcuts", async ({ page }) => {
   await page.getByRole("button", { name: "使用首页", exact: true }).click();
   await expect(page.getByText("Ctrl+Alt+Q", { exact: true })).toBeVisible();
 });
+
+test("selector stays transparent and accepts a visible drag region", async ({
+  page,
+}) => {
+  await page.goto("/?preview=1&window=selector");
+  await expect(page.locator("html")).toHaveCSS(
+    "background-color",
+    "rgba(0, 0, 0, 0)",
+  );
+  await page.mouse.move(200, 200);
+  await page.mouse.down();
+  await page.mouse.move(800, 350);
+  await page.mouse.up();
+  await expect(page.locator(".selection-box span")).toHaveText("600 × 150");
+  await expect(page.locator(".selection-hint p")).toHaveCount(0);
+});
+
+test("new caption resets scroll and capture errors remain visible", async ({
+  page,
+}) => {
+  await page.goto("/?preview=1&window=overlay");
+  await expect(page.getByText("按识别快捷键读取问题")).toBeVisible();
+  const caption = {
+    request_id: "first",
+    question: "First question",
+    answer: "A long answer.\n".repeat(100),
+    profile_id: "example",
+    revision: "1",
+    status: "ready",
+    detail: "",
+    elapsed_ms: 900,
+    cached: false,
+  };
+  await page.evaluate(
+    (c) => window.dispatchEvent(new CustomEvent("caption", { detail: c })),
+    caption,
+  );
+  await page.locator(".caption-content").evaluate((el) => {
+    el.scrollTop = 800;
+  });
+  await page.evaluate(() =>
+    window.dispatchEvent(
+      new CustomEvent("notice", { detail: "没有识别到文字，请重新框选" }),
+    ),
+  );
+  await expect(page.getByText("没有识别到文字，请重新框选")).toBeVisible();
+  await page.evaluate(
+    (c) => window.dispatchEvent(new CustomEvent("caption", { detail: c })),
+    {
+      ...caption,
+      request_id: "second",
+      question: "Second question",
+      answer: "A complete new answer.",
+    },
+  );
+  await expect(page.getByText("Second question")).toBeVisible();
+  await expect(page.getByText("A complete new answer.")).toBeVisible();
+  await expect(page.locator(".caption-notice")).toHaveCount(0);
+  await expect
+    .poll(() => page.locator(".caption-content").evaluate((el) => el.scrollTop))
+    .toBe(0);
+});
