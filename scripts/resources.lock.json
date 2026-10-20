@@ -1,0 +1,34 @@
+{
+  "files": [
+    {
+      "path": "models/det.onnx",
+      "url": "https://www.modelscope.cn/models/RapidAI/RapidOCR/resolve/v3.10.0/onnx/PP-OCRv4/det/ch_PP-OCRv4_det_mobile.onnx",
+      "sha256": "d2a7720d45a54257208b1e13e36a8479894cb74155a5efe29462512d42f49da9"
+    },
+    {
+      "path": "models/rec.onnx",
+      "url": "https://www.modelscope.cn/models/RapidAI/RapidOCR/resolve/v3.10.0/onnx/PP-OCRv4/rec/ch_PP-OCRv4_rec_mobile.onnx",
+      "sha256": "48fc40f24f6d2a207a2b1091d3437eb3cc3eb6b676dc3ef9c37384005483683b"
+    },
+    {
+      "path": "models/cls.onnx",
+      "url": "https://www.modelscope.cn/models/RapidAI/RapidOCR/resolve/v3.10.0/onnx/PP-OCRv4/cls/ch_ppocr_mobile_v2.0_cls_mobile.onnx",
+      "sha256": "e47acedf663230f8863ff1ab0e64dd2d82b838fceb5957146dab185a89d6215c"
+    },
+    {
+      "path": "models/paddle-keys.txt",
+      "url": "https://www.modelscope.cn/models/RapidAI/RapidOCR/resolve/v3.10.0/paddle/PP-OCRv4/rec/ch_PP-OCRv4_rec_mobile/ppocr_keys_v1.txt",
+      "sha256": "28b2362ad4ab2dc38769aa72feb535e3a9ddb3fd2a7585a05920e6393b1dc7f7"
+    },
+    {
+      "path": "models/LICENSE-PaddleOCR",
+      "url": "https://raw.githubusercontent.com/PaddlePaddle/PaddleOCR/v2.7.3/LICENSE",
+      "sha256": "ff6311c56c1b22c9209c96cc8afc16da91c24ee55a15e14ebc46fe1960dbd856"
+    }
+  ],
+  "runtime": {
+    "filename": "onnxruntime-win-x64-1.22.0.zip",
+    "url": "https://github.com/microsoft/onnxruntime/releases/download/v1.22.0/onnxruntime-win-x64-1.22.0.zip",
+    "sha256": "174c616efc0271194488642a72f1a514e01487da4dfe84c49296d66e40ebe0da"
+  }
+}
