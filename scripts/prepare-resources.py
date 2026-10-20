@@ -36,7 +36,7 @@ def main():
     # paddle-ocr-rs' explicit dictionary API expects CTC blank at index zero
     # and the extra space token at the end; upstream Paddle dictionary omits both.
     raw = (RESOURCE / "models" / "paddle-keys.txt").read_text(encoding="utf-8").rstrip("\r\n")
-    (RESOURCE / "models" / "keys.txt").write_text("#\n" + raw + "\n ", encoding="utf-8")
+    (RESOURCE / "models" / "keys.txt").write_text("#\n" + raw + "\n ", encoding="utf-8", newline="\n")
     archive = manifest["runtime"]
     path = ROOT / "artifacts" / archive["filename"]
     path.parent.mkdir(exist_ok=True)

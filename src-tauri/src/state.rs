@@ -12,7 +12,7 @@ use std::{
     path::{Path, PathBuf},
     sync::{
         Arc, Mutex,
-        atomic::{AtomicBool, Ordering},
+        atomic::{AtomicBool, AtomicU64, Ordering},
     },
 };
 
@@ -50,6 +50,7 @@ pub struct AppState {
     pub ocr: Mutex<Option<Ocr>>,
     pub ocr_status: Mutex<String>,
     pub capturing: AtomicBool,
+    pub input_epoch: AtomicU64,
     pub visible: AtomicBool,
     pub adjusting: AtomicBool,
     pub selecting: AtomicBool,
@@ -78,6 +79,7 @@ impl AppState {
             ocr: Mutex::new(None),
             ocr_status: Mutex::new("正在准备 OCR…".into()),
             capturing: AtomicBool::new(false),
+            input_epoch: AtomicU64::new(0),
             visible: AtomicBool::new(true),
             adjusting: AtomicBool::new(false),
             selecting: AtomicBool::new(false),

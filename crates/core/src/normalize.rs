@@ -10,7 +10,21 @@ pub fn question_key(text: &str) -> String {
         let next = chars.get(i + 1).copied();
         let numeric_comma = c == ','
             && prev.is_some_and(|x| x.is_ascii_digit())
-            && next.is_some_and(|x| x.is_ascii_digit());
+            && next.is_some_and(|x| x.is_ascii_digit())
+            && {
+                let start = chars[..i]
+                    .iter()
+                    .rposition(|c| !c.is_ascii_digit() && *c != ',')
+                    .map_or(0, |p| p + 1);
+                let end = chars[i..]
+                    .iter()
+                    .position(|c| !c.is_ascii_digit() && *c != ',')
+                    .map_or(chars.len(), |p| i + p);
+                let number: String = chars[start..end].iter().collect();
+                let mut groups = number.trim_end_matches(',').split(',');
+                let first = groups.next().unwrap_or("");
+                (1..=3).contains(&first.len()) && groups.all(|g| g.len() == 3)
+            };
         if numeric_comma {
             continue;
         }
@@ -51,6 +65,8 @@ mod tests {
             (".NET", "NET"),
             ("a != b", "a = b"),
             ("past 100", "past 1000"),
+            ("choose 1,2,3", "choose 123"),
+            ("value 1,5", "value 15"),
         ] {
             assert_ne!(question_key(a), question_key(b), "{a} / {b}");
         }

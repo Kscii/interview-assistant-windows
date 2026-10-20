@@ -49,7 +49,8 @@ impl RigModel {
         let http = rig_reqwest::reqwest::Client::builder()
             .redirect(rig_reqwest::reqwest::redirect::Policy::none())
             .connect_timeout(std::time::Duration::from_secs(10))
-            .timeout(std::time::Duration::from_secs(180))
+            // Each caller owns its deadline (up to 300s for live answers).
+            .timeout(std::time::Duration::from_secs(600))
             .build()?;
         Ok(Self {
             secrets,

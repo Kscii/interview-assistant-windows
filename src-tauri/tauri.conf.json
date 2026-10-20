@@ -11,16 +11,51 @@
   },
   "app": {
     "windows": [
-      {"label":"main","title":"Interview Assistant · 面试字幕助手","width":1180,"height":820,"minWidth":880,"minHeight":620},
-      {"label":"overlay","url":"index.html?window=overlay","title":"Interview subtitles","width":1100,"height":430,"x":100,"y":80,"decorations":false,"alwaysOnTop":true,"skipTaskbar":true,"visible":false,"focus":false,"resizable":true}
+      {
+        "label": "main",
+        "title": "Interview Assistant · 面试字幕助手",
+        "width": 1180,
+        "height": 820,
+        "minWidth": 880,
+        "minHeight": 620
+      },
+      {
+        "label": "overlay",
+        "url": "index.html?window=overlay",
+        "title": "Interview subtitles",
+        "width": 1100,
+        "height": 430,
+        "x": 100,
+        "y": 80,
+        "decorations": false,
+        "alwaysOnTop": true,
+        "skipTaskbar": true,
+        "visible": false,
+        "focus": false,
+        "resizable": true
+      }
     ],
-    "security": {"csp":"default-src 'self'; connect-src ipc: http://ipc.localhost; img-src 'self' asset: http://asset.localhost data:; style-src 'self' 'unsafe-inline'; script-src 'self'"}
+    "security": {
+      "csp": "default-src 'self'; connect-src ipc: http://ipc.localhost; img-src 'self' asset: http://asset.localhost data:; style-src 'self' 'unsafe-inline'; script-src 'self'"
+    }
   },
   "bundle": {
-    "active":true,
-    "targets":["nsis"],
-    "icon":["icons/icon.ico","icons/32x32.png","icons/128x128.png"],
-    "resources":["resources/models/*","resources/runtime/*","resources/licenses/**/*","resources/resource-manifest.json"],
-    "windows": {"webviewInstallMode":{"type":"downloadBootstrapper"},"nsis":{"installMode":"currentUser","languages":["SimpChinese","English"],"displayLanguageSelector":true}}
+    "active": true,
+    "targets": ["nsis"],
+    "icon": ["icons/icon.ico", "icons/32x32.png", "icons/128x128.png"],
+    "resources": [
+      "resources/models/*",
+      "resources/runtime/*",
+      "resources/licenses/**/*",
+      "resources/resource-manifest.json"
+    ],
+    "windows": {
+      "webviewInstallMode": { "type": "downloadBootstrapper" },
+      "nsis": {
+        "installMode": "currentUser",
+        "languages": ["SimpChinese", "English"],
+        "displayLanguageSelector": true
+      }
+    }
   }
 }

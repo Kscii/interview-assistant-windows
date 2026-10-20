@@ -112,6 +112,7 @@ pub async fn capture_question(app: &AppHandle, cloud: bool) -> Result<()> {
         }
     }
     let _reset = Reset(state.clone());
+    let epoch = state.input_epoch.fetch_add(1, Ordering::SeqCst) + 1;
     app.emit("capture-feedback", ())?;
     let result = async {
         let region = state
@@ -150,7 +151,9 @@ pub async fn capture_question(app: &AppHandle, cloud: bool) -> Result<()> {
             })
             .await??
         };
-        submit_text(&state, question, false)?;
+        if state.input_epoch.load(Ordering::SeqCst) == epoch {
+            submit_text(&state, question, false)?;
+        }
         Ok(())
     }
     .await;
@@ -174,6 +177,8 @@ pub async fn recognize_cloud(state: &AppState, image: &image::RgbImage) -> Resul
     Ok(response.text)
 }
 pub fn submit_text(state: &Arc<AppState>, question: String, force: bool) -> Result<CaptionState> {
+    // Manual input also invalidates an older local/cloud OCR job.
+    state.input_epoch.fetch_add(1, Ordering::SeqCst);
     let settings = state.settings()?;
     let profile = state.profile(
         &settings

@@ -173,6 +173,7 @@ async fn dispatch(app: AppHandle, window: WebviewWindow, action: &str, p: Value)
                 .lock()
                 .unwrap()
                 .put("settings", "main", &settings)?;
+            state.input_epoch.fetch_add(1, Ordering::SeqCst);
             state.runtime.invalidate();
             Ok(json!(profile))
         }
@@ -195,6 +196,7 @@ async fn dispatch(app: AppHandle, window: WebviewWindow, action: &str, p: Value)
                     .lock()
                     .unwrap()
                     .put("settings", "main", &settings)?;
+                state.input_epoch.fetch_add(1, Ordering::SeqCst);
                 state.runtime.invalidate();
             }
             Ok(Value::Null)
@@ -278,6 +280,7 @@ async fn dispatch(app: AppHandle, window: WebviewWindow, action: &str, p: Value)
                 .unwrap()
                 .put("settings", "main", &settings)?;
             if settings.active_profile != old.active_profile {
+                state.input_epoch.fetch_add(1, Ordering::SeqCst);
                 state.runtime.invalidate();
             }
             desktop::sync_overlay(&app, &state)?;
@@ -326,6 +329,7 @@ async fn dispatch(app: AppHandle, window: WebviewWindow, action: &str, p: Value)
             Ok(Value::Null)
         }
         "cloud_retry" => {
+            let epoch = state.input_epoch.fetch_add(1, Ordering::SeqCst) + 1;
             let image = state
                 .last_image
                 .lock()
@@ -333,7 +337,11 @@ async fn dispatch(app: AppHandle, window: WebviewWindow, action: &str, p: Value)
                 .clone()
                 .ok_or_else(|| anyhow::anyhow!("请先截图一次，再使用云端识别"))?;
             let q = desktop::recognize_cloud(&state, &image).await?;
-            Ok(json!(desktop::submit_text(&state, q, false)?))
+            if state.input_epoch.load(Ordering::SeqCst) == epoch {
+                Ok(json!(desktop::submit_text(&state, q, false)?))
+            } else {
+                Ok(Value::Null)
+            }
         }
         "submit_text" => Ok(json!(desktop::submit_text(
             &state,
