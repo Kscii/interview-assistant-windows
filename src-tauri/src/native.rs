@@ -120,7 +120,7 @@ pub fn capture(region: &OcrRegion) -> Result<RgbImage> {
         SetThreadDpiAwarenessContext(previous);
         anyhow::ensure!(rows == region.height as i32, "截图失败，请重试");
         let mut rgb = Vec::with_capacity(region.width as usize * region.height as usize * 3);
-        for p in bgra.chunks_exact(4) {
+        for p in bgra.as_chunks::<4>().0 {
             rgb.extend_from_slice(&[p[2], p[1], p[0]]);
         }
         RgbImage::from_raw(region.width, region.height, rgb)
