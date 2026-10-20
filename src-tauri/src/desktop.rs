@@ -120,6 +120,13 @@ pub async fn capture_question(app: &AppHandle, cloud: bool) -> Result<()> {
     let _reset = Reset(state.clone());
     let epoch = state.input_epoch.fetch_add(1, Ordering::SeqCst) + 1;
     app.emit("capture-feedback", ())?;
+    let main = app.get_webview_window("main");
+    let restore_main = main
+        .as_ref()
+        .is_some_and(|w| w.is_focused().unwrap_or(false));
+    if restore_main && let Some(w) = &main {
+        w.hide()?;
+    }
     let result = async {
         let region = state
             .settings()?
@@ -169,6 +176,10 @@ pub async fn capture_question(app: &AppHandle, cloud: bool) -> Result<()> {
         && let Some(w) = app.get_webview_window("overlay")
     {
         let _ = w.show();
+    }
+    if restore_main && let Some(w) = &main {
+        let _ = w.show();
+        let _ = w.set_focus();
     }
     result
 }
@@ -220,6 +231,12 @@ pub fn select_region(app: &AppHandle, state: &AppState) -> Result<()> {
         w.hide()?;
     }
     let result = (|| -> Result<()> {
+        if let Some(w) = app.get_webview_window("main") {
+            state
+                .selection_restore_main
+                .store(w.is_visible()?, Ordering::SeqCst);
+            w.hide()?;
+        }
         for (i, monitor) in monitors(app)?.into_iter().enumerate() {
             let label = format!("selector-{i}");
             state
@@ -248,11 +265,11 @@ pub fn select_region(app: &AppHandle, state: &AppState) -> Result<()> {
         Ok(())
     })();
     if result.is_err() {
-        let _ = finish_selection(app, state);
+        let _ = finish_selection(app, state, true);
     }
     result
 }
-pub fn finish_selection(app: &AppHandle, state: &AppState) -> Result<()> {
+pub fn finish_selection(app: &AppHandle, state: &AppState, cancelled: bool) -> Result<()> {
     let labels = state
         .selectors
         .lock()
@@ -267,6 +284,14 @@ pub fn finish_selection(app: &AppHandle, state: &AppState) -> Result<()> {
     }
     state.selectors.lock().unwrap().clear();
     state.selecting.store(false, Ordering::SeqCst);
+    let restore_main = state.selection_restore_main.swap(false, Ordering::SeqCst);
+    if cancelled
+        && restore_main
+        && let Some(w) = app.get_webview_window("main")
+    {
+        w.show()?;
+        w.set_focus()?;
+    }
     if state.is_visible()
         && let Some(w) = app.get_webview_window("overlay")
     {

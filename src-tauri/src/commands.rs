@@ -317,11 +317,11 @@ async fn dispatch(app: AppHandle, window: WebviewWindow, action: &str, p: Value)
                 .lock()
                 .unwrap()
                 .put("settings", "main", &settings)?;
-            desktop::finish_selection(&app, &state)?;
+            desktop::finish_selection(&app, &state, false)?;
             Ok(Value::Null)
         }
         "cancel_selection" => {
-            desktop::finish_selection(&app, &state)?;
+            desktop::finish_selection(&app, &state, true)?;
             Ok(Value::Null)
         }
         "capture" => {
